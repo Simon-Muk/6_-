@@ -6,6 +6,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from .permissions import IsModerator
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Category, Product, Review
 from .serializers import (
@@ -156,3 +158,29 @@ class ProductWithReviewsAPIView(APIView):
 
         serializer = ProductWithReviewsSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+    
+
+class ProductListCreateView(ListCreateAPIView):
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_permissions(self):
+        
+        if self.request.user.is_staff:
+            return [IsModerator()]
+    
+        return [IsAuthenticated()]
+    
+
+class ProductDetailView(RetrieveUpdateDestroyAPIView):
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_permissions(self):
+        
+        if self.request.user.is_staff:
+            return [IsModerator()]
+    
+        return [IsAuthenticated()]
