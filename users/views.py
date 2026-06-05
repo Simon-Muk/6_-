@@ -8,6 +8,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView
+)
 
 from users.models import CustomUser
 
@@ -16,6 +19,7 @@ from .serializers import (
     AuthValidateSerializer,
     ConfirmationSerializer,
     RegisterValidateSerializer,
+    MyTokenObtainPairSerializer,
 )
 
 
@@ -89,3 +93,12 @@ class ConfirmUserAPIView(APIView):
             status=status.HTTP_200_OK,
             data={"message": "User аккаунт успешно активирован", "key": token.key},
         )
+
+
+class MyTokenObtainPairView(
+    TokenObtainPairView
+):
+
+    serializer_class = (
+        MyTokenObtainPairSerializer
+    )

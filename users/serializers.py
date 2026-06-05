@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer
+)
 from .models import ConfirmationCode
-from .models import User
+from .models import CustomUser
 from users.models import CustomUser
 from django.contrib.auth import authenticate
 
@@ -57,12 +60,13 @@ class RegisterSerializer(
     )
 
     class Meta:
-        model = User
+        model = CustomUser
 
         fields = [
             'email',
             'password',
-            'phone_number'
+            'phone_number',
+            'birthdate'
         ]
 
     def create(self, validated_data):
@@ -71,7 +75,7 @@ class RegisterSerializer(
             'password'
         )
 
-        user = User.objects.create_user(
+        user = CustomUser.objects.create_user(
             password=password,
             **validated_data
         )
@@ -108,3 +112,23 @@ class LoginSerializer(
         attrs['user'] = user
 
         return attrs
+    
+
+class MyTokenObtainPairSerializer(
+    TokenObtainPairSerializer
+):
+
+    @classmethod
+    def get_token(cls, user):
+
+        token = super().get_token(user)
+
+        token['email'] = user.email
+
+        token['birthdate'] = (
+            str(user.birthdate)
+            if user.birthdate
+            else None
+        )
+
+        return token

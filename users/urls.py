@@ -1,5 +1,5 @@
 from django.urls import path
-from users.views import RegistrationAPIView, AuthorizationAPIView, ConfirmUserAPIView
+from users.views import RegistrationAPIView, AuthorizationAPIView, ConfirmUserAPIView, MyTokenObtainPairView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView
@@ -21,5 +21,11 @@ urlpatterns = [
             url_name='schema'
         ),
         name='swagger-ui'
+    ),
+
+    path(
+        'api/tokem/',
+        MyTokenObtainPairView.as_view(),
+        name='token_obtain_pair'
     ),
 ]

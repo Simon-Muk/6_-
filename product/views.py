@@ -20,6 +20,10 @@ from .serializers import (
     ReviewValidateSerializer
 )
 
+from common.validators import (
+    validate_user_age
+)
+
 PAGE_SIZE = 5
 
 
@@ -92,6 +96,17 @@ class ProductListCreateAPIView(ListCreateAPIView):
         return Response(data=ProductSerializer(product).data,
                         status=status.HTTP_201_CREATED)
 
+    def create(self, request, *args, **kwargs):
+
+        validate_user_age(request)
+        
+        return super().create(
+            request,
+            *args,
+            **kwargs
+        )
+            
+    
 
 class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.select_related('category').all()

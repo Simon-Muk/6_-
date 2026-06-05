@@ -74,6 +74,11 @@ class CustomUser(
     AbstractBaseUser,
     PermissionsMixin
 ):
+    
+    birthdate = models.DateField(
+        null=True,
+        blank=True
+    )
 
     email = models.EmailField(
         unique=True
