@@ -1,3 +1,4 @@
+import os
 import random
 import string
 
@@ -102,3 +103,29 @@ class MyTokenObtainPairView(
     serializer_class = (
         MyTokenObtainPairSerializer
     )
+
+
+class GoogleLoginAPIView(APIView):
+
+    def get(self, request):
+
+        client_id = os.getenv(
+            'GOOGLE_CLIENT_ID'
+        )
+
+        redirect_uri = (
+            'http://127.0.0.1:8000'
+            '/api/v1/users/google/callback/'
+        )
+
+        google_auth_url = (
+            'https://accounts.google.com/o/oauth2/v2/auth'
+            f'?client_id={client_id}'
+            f'&redirect_uri={redirect_uri}'
+            '&response_type=code'
+            '&scope=openid email profile'
+        )
+
+        return Response({
+            'auth_url': google_auth_url
+        })

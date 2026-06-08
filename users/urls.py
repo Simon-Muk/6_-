@@ -28,4 +28,14 @@ urlpatterns = [
         MyTokenObtainPairView.as_view(),
         name='token_obtain_pair'
     ),
+
+    path(
+        'google/login/',
+        GoogleLoginAPIView.as_view()
+    ),
+
+    path(
+        'google/callback/',
+        GoogleCallbackAPIView.as_view()
+    ),
 ]

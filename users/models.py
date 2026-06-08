@@ -102,6 +102,21 @@ class CustomUser(
         auto_now_add=True
     )
 
+    first_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    last_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    registration_source = models.CharField(
+        max_length=30,
+        default='local'
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
