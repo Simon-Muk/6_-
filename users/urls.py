@@ -1,5 +1,5 @@
 from django.urls import path
-from users.views import RegistrationAPIView, AuthorizationAPIView, ConfirmUserAPIView, MyTokenObtainPairView
+from users.views import RegistrationAPIView, AuthorizationAPIView, ConfirmUserAPIView, MyTokenObtainPairView, GoogleLoginAPIView, GoogleCallbackAPIView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView

@@ -15,7 +15,8 @@ from rest_framework_simplejwt.views import (
 
 from users.models import CustomUser
 
-from .models import ConfirmationCode
+from common.redis import redis_client
+
 from .serializers import (
     AuthValidateSerializer,
     ConfirmationSerializer,
@@ -66,7 +67,12 @@ class RegistrationAPIView(CreateAPIView):
             # Create a random 6-digit code
             code = "".join(random.choices(string.digits, k=6))
 
-            confirmation_code = ConfirmationCode.objects.create(user=user, code=code)
+            redis_client.set(
+                f'confirmation_code:{user.email}',
+                code,
+                ex=300
+)
+
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -88,7 +94,6 @@ class ConfirmUserAPIView(APIView):
 
             token, _ = Token.objects.get_or_create(user=user)
 
-            ConfirmationCode.objects.filter(user=user).delete()
 
         return Response(
             status=status.HTTP_200_OK,
@@ -128,4 +133,12 @@ class GoogleLoginAPIView(APIView):
 
         return Response({
             'auth_url': google_auth_url
+        })
+    
+
+class GoogleCallbackAPIView(APIView):
+
+    def get(self, request):
+        return Response({
+            'message': 'Google callback works'
         })
