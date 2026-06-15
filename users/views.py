@@ -14,6 +14,8 @@ from rest_framework_simplejwt.views import (
 )
 
 from users.models import CustomUser
+from users.tasks import send_welcome_message
+from users.tasks import send_confirmation_email
 
 from common.redis import redis_client
 
@@ -86,6 +88,11 @@ class ConfirmUserAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user_id = serializer.validated_data["user_id"]
+        send_welcome_message.delay(user.email)
+        send_confirmation_email.delay(
+            user.email,
+            code
+        )
 
         with transaction.atomic():
             user = CustomUser.objects.get(id=user_id)
