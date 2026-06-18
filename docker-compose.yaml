@@ -1,20 +1,63 @@
-version: '3'
 services:
-  shop_api:
-    build:
-      context: .
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+
+  web:
+    build: .
+    container_name: b-63-web
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
-      - "7001:8000"
+      - "8000:8000"
+    env_file:
+      - .env
     depends_on:
-      - shop_api_db
-  shop_api_db:
-    image: "postgres:14"
+      - db
+      - redis
+
+  db:
+    image: postgres:16
+    container_name: b-63-db
+    restart: always
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=shop_api_db
-      - POSTGRES_USER=shop_api_user_db
-      - POSTGRES_PASSWORD=12345
-    volumes:
-      - 'shop_api-data:/var/lib/postgresql/data'
-volumes:
-  shop_api-data:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: b-63-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    container_name: b-63-celery_worker
+    command: celery -A shop_api worker -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  celery-beat:
+    build: .
+    container_name: b-63-celery_beat
+    command: celery -A shop_api beat -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  flower:
+    build: .
+    container_name: b-63-celery_flower
+    command: celery -A shop_api flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - celery
